@@ -2,6 +2,7 @@ const debug = require('debug')('sweet-sixteen:example');
 const LowLevelApi = require("./lowlevel");
 const RPiDriver = require("./driver/rpi");
 const WebSocketDriver = require("./driver/websocket");
+const readline = require('readline');
 
 ll = new LowLevelApi();
 RPiDriver.canRun()
@@ -16,10 +17,18 @@ RPiDriver.canRun()
 	.then(() => debug('Setting up Drivers'))
 	.then(() => ll.setup())
 
-	.then(() => debug('Transmitting some Data'))
-	.then(() => ll.transmit(0xABCD))
-	.then(() => ll.latch())
-	.then(() => debug('Done. Bye.'));
+	.then(() => console.log('Type one Packet per Line to transmit, type an empty line to latch'));
 
-// The WebSocketDriver will keep the Program running
-// Without it we would terminate now
+const rl = readline.createInterface({
+	input: process.stdin,
+	output: process.stdout
+});
+rl.on('line', (input) => {
+	if(input == '') {
+		ll.latch();
+	}
+	else {
+		n = parseInt(input, 16);
+		ll.transmit([n]);
+	}
+});

@@ -8,8 +8,9 @@ const ecstatic = require('ecstatic');
 class WebsocketDriver {
 	constructor(port = 8080) {
 		this.port = port;
-		this.transmitted = null;
-		this.latched = null;
+		this.shiftRegisterLength = 9 * 4;
+		this.transmitted = WebsocketDriver.ensureArrayLength([], this.shiftRegisterLength);
+		this.latched = this.transmitted;
 	}
 
 	static canRun() {
@@ -59,7 +60,11 @@ class WebsocketDriver {
 
 	transmit(data) {
 		debug('WebsocketDriver Transmit');
-		this.transmitted = data;
+		for(let register in data) {
+			this.transmitted.unshift(data[register]);
+		}
+
+		this.transmitted = WebsocketDriver.ensureArrayLength(this.transmitted, this.shiftRegisterLength);
 		return Promise.resolve()
 	}
 
@@ -68,6 +73,36 @@ class WebsocketDriver {
 		this.latched = this.transmitted;
 		this.io.sockets.emit('update', {state: this.latched});
 		return Promise.resolve()
+	}
+
+	/**
+	 *  > ensureArrayLength([7,8,9], 5)
+	 *  [ 7, 8, 9, 0, 0 ]
+	 *  > ensureArrayLength([6,7,8,9], 5)
+	 *  [ 6, 7, 8, 9, 0 ]
+	 *  > ensureArrayLength([5,6,7,8,9], 5)
+	 *  [ 5, 6, 7, 8, 9 ]
+	 *  > ensureArrayLength([4,5,6,7,8,9], 5)
+	 *  [ 4, 5, 6, 7, 8 ]
+	 *  > ensureArrayLength([3,4,5,6,7,8,9], 5)
+	 *  [ 3, 4, 5, 6, 7 ]
+	 *
+	 * @param incoming
+	 * @param targetLength
+	 * @returns {*}
+	 */
+	static ensureArrayLength(incoming, targetLength) {
+		if(incoming.length > targetLength) {
+			return incoming.slice(0, targetLength);
+		}
+		else if(incoming.length < targetLength) {
+			const fill = new Array(targetLength - incoming.length);
+			fill.fill(0);
+			return incoming.concat(fill);
+		}
+		else {
+			return incoming;
+		}
 	}
 }
 

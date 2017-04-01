@@ -1,0 +1,55 @@
+.board {
+	width: 994px;
+	height: 900px;
+
+	background-image: url(sweet-sixteen-stripped.png);
+
+	@w: 210px;
+	@h: 297px;
+	@xOffset: 33px;
+	@xGutter: 38px;
+	@yOffset: 116px;
+	@yGutter: 63px;
+
+	.display {
+		@cDisabled: hsl(69, 10%, 80%);
+		@cGreen: hsl(113, 100%, 48%);
+		@cRed: hsl(10, 100%, 48%);
+
+		position: absolute;
+		width: @w;
+		height: @h;
+
+		.row(@y) when (@y < 2) {
+			.cell(@y, @x) when (@x < 4) {
+
+				&.d-@{y}-@{x} {
+					top: @yOffset + (@y * (@h + @yGutter));
+					left: @xOffset + (@x * (@w + @xGutter));
+				}
+
+				.cell(@y, @x+1);
+			}
+
+			.cell(@y, 0);
+			.row(@y + 1);
+		}
+		.row(0);
+
+		path, circle {
+			fill: @cDisabled !important;
+		}
+
+		&.green {
+			path.enabled, circle.enabled {
+				fill: @cGreen !important;
+			}
+		}
+
+		&.red {
+			path.enabled, circle.enabled {
+				fill: @cRed !important;
+			}
+		}
+	}
+}

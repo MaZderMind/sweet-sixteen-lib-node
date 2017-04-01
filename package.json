@@ -8,6 +8,9 @@
     "bluebird": "^3.5.0",
     "debug": "^2.6.3",
     "ecstatic": "^2.1.0",
-    "express": "^4.15.2"
+    "express": "^4.15.2",
+    "jquery": "^2.2",
+    "jquery-svg-to-inline": "^0.1.4",
+    "socket.io": "^1.7.3"
   }
 }

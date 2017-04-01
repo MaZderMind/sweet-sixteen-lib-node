@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   version="1.1"
+   id="svg4961"
+   viewBox="0 0 61.873052 59.851597"
+   height="16.891451mm"
+   width="17.46195mm">
+  <defs
+     id="defs4963">
+    <linearGradient
+       id="linearGradient5526">
+      <stop
+         id="stop5528"
+         offset="0"
+         style="stop-color:#ffffff;stop-opacity:1" />
+      <stop
+         id="stop5530"
+         offset="1"
+         style="stop-color:#a9a9a9;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,0.96732907,0,43.733739)"
+       r="30.936525"
+       fy="1338.6133"
+       fx="280.31738"
+       cy="1338.6133"
+       cx="280.31738"
+       id="radialGradient5534"
+       xlink:href="#linearGradient5526" />
+  </defs>
+  <metadata
+     id="metadata4966">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-249.38086,-1308.6875)"
+     id="layer1">
+    <path
+       id="path5520"
+       d="m 269.35938,1308.6875 a 30.935923,30.935923 0 0 0 -19.97852,28.916 30.935923,30.935923 0 0 0 30.93555,30.9356 30.935923,30.935923 0 0 0 30.9375,-30.9356 30.935923,30.935923 0 0 0 -20.04493,-28.916 l -21.8496,0 z"
+       style="fill:url(#radialGradient5534);fill-opacity:1;stroke:none;stroke-opacity:1" />
+  </g>
+</svg>

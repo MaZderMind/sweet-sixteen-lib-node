@@ -19,7 +19,6 @@ RPiDriver.canRun()
 	.then(() => debug('Transmitting some Data'))
 	.then(() => ll.transmit(0xABCD))
 	.then(() => ll.latch())
-
 	.then(() => debug('Done. Bye.'));
 
 // The WebSocketDriver will keep the Program running

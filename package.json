@@ -1,0 +1,13 @@
+{
+  "name": "sweet-sixteen-lib-node",
+  "version": "1.0.0",
+  "description": "Library for Controlling the SweetSixten 16-Segment Display",
+  "author": "MaZderMind",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "debug": "^2.6.3",
+    "ecstatic": "^2.1.0",
+    "express": "^4.15.2"
+  }
+}

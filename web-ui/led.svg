@@ -14,15 +14,26 @@
   <defs
      id="defs4963">
     <linearGradient
-       id="linearGradient5526">
+       id="gDisabled">
       <stop
-         id="stop5528"
+         id="s1"
          offset="0"
          style="stop-color:#ffffff;stop-opacity:1" />
       <stop
-         id="stop5530"
+         id="s2"
          offset="1"
          style="stop-color:#a9a9a9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient
+       id="gEnabled">
+      <stop
+         id="s3"
+         offset="0"
+         style="stop-color:#ffffff;stop-opacity:1" />
+      <stop
+         id="s4"
+         offset="1"
+         style="stop-color:#ff0000;stop-opacity:1" />
     </linearGradient>
     <radialGradient
        gradientUnits="userSpaceOnUse"
@@ -32,8 +43,18 @@
        fx="280.31738"
        cy="1338.6133"
        cx="280.31738"
-       id="radialGradient5534"
-       xlink:href="#linearGradient5526" />
+       id="rDisabled"
+       xlink:href="#gDisabled" />
+    <radialGradient
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,0.96732907,0,43.733739)"
+       r="30.936525"
+       fy="1338.6133"
+       fx="280.31738"
+       cy="1338.6133"
+       cx="280.31738"
+       id="rEnabled"
+       xlink:href="#gEnabled" />
   </defs>
   <metadata
      id="metadata4966">
@@ -53,6 +74,6 @@
     <path
        id="path5520"
        d="m 269.35938,1308.6875 a 30.935923,30.935923 0 0 0 -19.97852,28.916 30.935923,30.935923 0 0 0 30.93555,30.9356 30.935923,30.935923 0 0 0 30.9375,-30.9356 30.935923,30.935923 0 0 0 -20.04493,-28.916 l -21.8496,0 z"
-       style="fill:url(#radialGradient5534);fill-opacity:1;stroke:none;stroke-opacity:1" />
+       style="fill:url(#rDisabled);fill-opacity:1;stroke:none;stroke-opacity:1" />
   </g>
 </svg>

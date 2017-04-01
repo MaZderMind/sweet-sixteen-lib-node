@@ -4,14 +4,14 @@
 
 	background-image: url(sweet-sixteen-stripped.png);
 
-	@w: 210px;
-	@h: 297px;
-	@xOffset: 33px;
-	@xGutter: 38px;
-	@yOffset: 116px;
-	@yGutter: 63px;
-
 	.display {
+		@w: 210px;
+		@h: 297px;
+		@xOffset: 33px;
+		@xGutter: 38px;
+		@yOffset: 116px;
+		@yGutter: 63px;
+
 		@cDisabled: hsl(69, 10%, 80%);
 		@cGreen: hsl(113, 100%, 48%);
 		@cRed: hsl(10, 100%, 48%);
@@ -50,6 +50,35 @@
 			path.enabled, circle.enabled {
 				fill: @cRed !important;
 			}
+		}
+	}
+
+	.led {
+		@sz: 54px;
+		@xOffset: 43px;
+		@xGutter: 70.25px;
+		@yOffset: 851px;
+
+		@cDisabled: hsl(69, 10%, 80%);
+		@cEnabled: hsl(113, 100%, 48%);
+
+		position: absolute;
+		width: @sz;
+		height: @sz;
+
+		top: @yOffset;
+
+		.cell(@x) when (@x < 8) {
+			&.l-@{x} {
+				left: @xOffset + (@x * (@sz + @xGutter));
+			}
+
+			.cell(@x + 1);
+		}
+		.cell(0);
+
+		path.enabled {
+			fill: url(#rEnabled) !important;
 		}
 	}
 }

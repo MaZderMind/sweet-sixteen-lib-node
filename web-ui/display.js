@@ -67,4 +67,14 @@ $(function () {
 		update(data.state);
 	});
 
+	$('.board').on('click', 'path, circle', function () {
+		var $segment = $(this);
+		var segmentId = $segment.attr('id');
+
+		var $display = $el.closest('svg');
+		var displayId = $display.data('id');
+
+		var $board = $display.closest('.board');
+		var boardId = $board.data('id');
+	})
 });

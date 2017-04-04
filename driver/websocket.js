@@ -11,6 +11,7 @@ class WebsocketDriver {
 		this.shiftRegisterLength = 9 * 4;
 		this.transmitted = WebsocketDriver.ensureArrayLength([], this.shiftRegisterLength);
 		this.latched = this.transmitted;
+		this.interaction = false;
 	}
 
 	static canRun() {
@@ -56,6 +57,12 @@ class WebsocketDriver {
 
 		debug("WebsocketDriver setup completed, now listening on", this.port);
 		return Promise.resolve()
+	}
+
+	enableInteraction(enable = true) {
+		debug('Enabling interaction through WebUI')
+		this.interaction = true;
+		return this;
 	}
 
 	transmit(data) {

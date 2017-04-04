@@ -1,8 +1,8 @@
-const debug = require('debug')('sweet-sixteen:LowLevel');
+const debug = require('debug')('sweet-sixteen:Api');
 const Promise = require('bluebird');
 let ecstatic = require('ecstatic');
 
-class LowLevel {
+class Api {
 	constructor() {
 		this.drivers = [];
 	}
@@ -36,4 +36,4 @@ class LowLevel {
 	}
 }
 
-module.exports = LowLevel;
+module.exports = Api;

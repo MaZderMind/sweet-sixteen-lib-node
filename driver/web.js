@@ -121,6 +121,10 @@ class WebDriver {
 		this.io.sockets.emit('update', {state: this.latched});
 		return Promise.resolve()
 	}
+
+	dim(value) {
+		return Promise.resolve();
+	}
 }
 
 module.exports = WebDriver;

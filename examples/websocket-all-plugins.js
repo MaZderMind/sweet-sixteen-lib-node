@@ -20,5 +20,6 @@ RPiDriver.canRun()
 	// setup and transmit
 	.then(() => debug('Setting up Drivers'))
 	.then(() => api.setup())
+	.then(() => api.dim(1.00))
 	.then(() => api.test())
 	.then(() => api.clear());

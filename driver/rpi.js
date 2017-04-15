@@ -1,7 +1,7 @@
 const debug = require('debug')('sweet-sixteen:RPiDriver');
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require("fs"));
-const SPI = require('pi-spi');
+const rpio = require('rpio');
 
 function retry(operation, delay) {
 	return operation().catch(function(reason) {
@@ -11,7 +11,8 @@ function retry(operation, delay) {
 
 class RPiDriver {
 	constructor() {
-		this.GPIO_LATCH = 22;
+		this.P_OE = 12;
+		this.P_LE = 15;
 		this.spi = null;
 	}
 
@@ -32,11 +33,10 @@ class RPiDriver {
 	}
 
 	setup() {
-		return Promise.all([
-			this.initializeSPI(),
-			this.openLatchGpio(),
-			this.openPWMGpio(),
-		]).then(() => debug('setup done'));
+		rpio.init({mapping: 'physical', gpiomem: false});
+		this.initializeSPI();
+		this.initializeLatchGpio();
+		this.initializeDimGpio();
 	}
 
 	transmit(data) {
@@ -47,49 +47,33 @@ class RPiDriver {
 		});
 
 		debug('buf', buf);
-		return this.spi.writeAsync(buf);
+		rpio.spiWrite(buf, buf.length);
+		return Promise.resolve();
+	}
+
+	dim(value) {
+		rpio.pwmSetData(this.P_OE, (1-value)*1024);
 	}
 
 	latch() {
-		return fs.writeFileAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH+'/value', '1')
-			.then(() => fs.writeFileAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH+'/value', '0'));
+		rpio.write(this.P_LE, rpio.HIGH);
+		rpio.write(this.P_LE, rpio.LOW);
 	}
 
 	initializeSPI() {
-		debug('SPI: initializing');
-		this.spi = Promise.promisifyAll( SPI.initialize("/dev/spidev0.0") );
-		debug('SPI: done');
-		return Promise.resolve();
+		rpio.spiBegin();
+		rpio.spiSetClockDivider(64); // 4 MHz
+		rpio.spiSetDataMode(0);
 	}
 
-	openLatchGpio() {
-		debug('Latch: initializing');
-		return fs.accessAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH, fs.constants.W_OK)
-			.then(() => debug('gpio already exported'))
-			.catch(() => {
-				debug('Latch: exporting gpio');
-				return fs.writeFileAsync('/sys/class/gpio/export', '22');
-			})
-			.then(() => retry(() => {
-				debug('Latch: waiting for expoer');
-				return Promise.all([
-					fs.accessAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH+'/direction', fs.constants.W_OK),
-					fs.accessAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH+'/value', fs.constants.W_OK),
-				]);
-			}, 250))
-			.then(() => {
-				debug('Latch: setting direction');
-				return fs.writeFileAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH+'/direction', 'out');
-			})
-			.then(() => {
-				debug('Latch: setting value');
-				return fs.writeFileAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH+'/value', '0');
-			})
-			.then(() => debug('Latch: done'));
+	initializeLatchGpio() {
+		rpio.open(this.P_LE, rpio.OUTPUT, rpio.LOW);
 	}
 
-	openPWMGpio() {
-		return Promise.resolve();
+	initializeDimGpio() {
+		rpio.open(this.P_OE, rpio.PWM, rpio.LOW);
+		rpio.pwmSetRange(this.P_OE, 1024);
+		rpio.pwmSetData(this.P_OE, 0);
 	}
 }
 

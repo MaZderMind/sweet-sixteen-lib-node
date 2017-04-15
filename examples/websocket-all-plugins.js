@@ -20,15 +20,5 @@ RPiDriver.canRun()
 	// setup and transmit
 	.then(() => debug('Setting up Drivers'))
 	.then(() => api.setup())
-	.then(() => api.transmit([]))
-	.then(() => api.latch());
-
-const rl = readline.createInterface({
-	input: process.stdin,
-	output: process.stdout
-});
-rl.on('line', (input) => {
-	let number = parseInt(input.trim(), 2);
-	api.transmit([0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, number]);
-	api.latch();
-});
+	.then(() => api.test())
+	.then(() => api.clear());

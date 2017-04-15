@@ -3,6 +3,12 @@ const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require("fs"));
 const SPI = require('pi-spi');
 
+function retry(operation, delay) {
+	return operation().catch(function(reason) {
+		return Promise.delay(delay).then(retry.bind(null, operation, delay));
+	});
+}
+
 class RPiDriver {
 	constructor() {
 		this.GPIO_LATCH = 22;
@@ -34,14 +40,12 @@ class RPiDriver {
 	}
 
 	transmit(data) {
-		debug('alloc', this.api.shiftRegisterCount);
 		const buf = Buffer.alloc(this.api.shiftRegisterCount * 2);
-		debug('data', data);
 		data.forEach((register, index) => {
 			const offset = (this.api.shiftRegisterCount * 2) - (index * 2) - 2;
-			debug(this.api.shiftRegisterCount * 2, index * 2, offset);
 			buf.writeUInt16BE(register, offset);
 		});
+
 		debug('buf', buf);
 		return this.spi.writeAsync(buf);
 	}
@@ -60,21 +64,28 @@ class RPiDriver {
 
 	openLatchGpio() {
 		debug('Latch: initializing');
-		fs.accessAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH, fs.constants.R_OK)
+		return fs.accessAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH, fs.constants.W_OK)
 			.then(() => debug('gpio already exported'))
 			.catch(() => {
-				debug('exporting gpio');
+				debug('Latch: exporting gpio');
 				return fs.writeFileAsync('/sys/class/gpio/export', '22');
 			})
+			.then(() => retry(() => {
+				debug('Latch: waiting for expoer');
+				return Promise.all([
+					fs.accessAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH+'/direction', fs.constants.W_OK),
+					fs.accessAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH+'/value', fs.constants.W_OK),
+				]);
+			}, 250))
 			.then(() => {
-				debug('setting direction');
+				debug('Latch: setting direction');
 				return fs.writeFileAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH+'/direction', 'out');
 			})
 			.then(() => {
-				debug('setting value');
+				debug('Latch: setting value');
 				return fs.writeFileAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH+'/value', '0');
 			})
-			.then(() => debug('Latch: done'))
+			.then(() => debug('Latch: done'));
 	}
 
 	openPWMGpio() {

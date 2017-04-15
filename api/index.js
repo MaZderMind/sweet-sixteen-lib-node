@@ -20,6 +20,7 @@ class Api {
 	}
 
 	transmit(data) {
+		debug('transmit');
 		data = Api.ensureArrayLength(data, this.shiftRegisterCount);
 		this.lastTransmittedData = data;
 		return Promise.all(
@@ -28,6 +29,7 @@ class Api {
 	}
 
 	latch() {
+		debug('latch');
 		return Promise.all(
 			this.drivers.map((driver) => driver.latch())
 		);
@@ -37,6 +39,21 @@ class Api {
 		return Promise.all(
 			this.drivers.map((driver) => driver.dim(brightness))
 		);
+	}
+
+	test() {
+		debug('test');
+		const full = new Array(this.shiftRegisterCount);
+		full.fill(0xFFFF);
+		return this.transmit(full)
+			.then(() => this.latch())
+			.delay(250);
+	}
+
+	clear() {
+		debug('clear');
+		return this.transmit([])
+			.then(() => this.latch());
 	}
 
 	/**

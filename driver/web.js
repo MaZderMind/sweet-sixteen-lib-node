@@ -5,22 +5,33 @@ const expressLess = require('express-less');
 const SocketIOServer = require('socket.io');
 const ecstatic = require('ecstatic');
 
-class WebsocketDriver {
+class WebDriver {
 	constructor(port = 8080) {
 		this.port = port;
 		this.shiftRegisterLength = 9 * 4;
-		this.transmitted = WebsocketDriver.ensureArrayLength([], this.shiftRegisterLength);
+		this.transmitted = WebDriver.ensureArrayLength([], this.shiftRegisterLength);
 		this.latched = this.transmitted;
 		this.interaction = false;
+		this.plugins = [];
+		this.clientPlugins = [];
+		this.libs = {
+			'jquery':               __dirname + '/../node_modules/jquery/dist',
+			'jquery-svg-to-inline': __dirname + '/../node_modules/jquery-svg-to-inline/dist',
+		};
 	}
 
 	static canRun() {
-		debug("WebsocketDriver can always run");
+		debug("WebDriver can always run");
 		return Promise.resolve()
 	}
 
 	setup() {
 		const app = express();
+		this.app = app;
+
+		this.plugins.forEach(plugin => {
+			if(plugin.beforeSetup) plugin.beforeSetup()
+		});
 
 		app.use(expressLess(
 			__dirname + '/../web-ui/'
@@ -30,16 +41,11 @@ class WebsocketDriver {
 			root: __dirname + '/../web-ui/'
 		}));
 
-		const libs = {
-			'jquery': 'jquery/dist',
-			'jquery-svg-to-inline': 'jquery-svg-to-inline/dist',
-		};
-
-		for(let lib in libs) {
-			const path = libs[lib];
+		for (let lib in this.libs) {
+			const path = this.libs[lib];
 			app.use(ecstatic({
-				baseDir: '/'+lib,
-				root:    __dirname + '/../node_modules/'+path
+				baseDir: '/' + lib,
+				root: path
 			}));
 		}
 
@@ -50,33 +56,64 @@ class WebsocketDriver {
 		const io = new SocketIOServer(server);
 		io.on('connection', (socket) => {
 			debug('New Connection, sending current latched State as Update');
+			socket.emit('setup', {
+				clientPlugins: this.clientPlugins
+			});
 			socket.emit('update', {state: this.latched});
+
+			this.plugins.forEach(plugin => {
+				if(plugin.onConnection) plugin.onConnection(socket);
+			});
+
 		});
 
 		this.io = io;
 
-		debug("WebsocketDriver setup completed, now listening on", this.port);
+		this.plugins.forEach(plugin => {
+			if(plugin.setup) plugin.setup();
+		});
+
+		debug("WebDriver setup completed, now listening on", this.port);
 		return Promise.resolve()
 	}
 
-	enableInteraction(enable = true) {
-		debug('Enabling interaction through WebUI')
-		this.interaction = true;
+	isSetupDone() {
+		return !!this.io;
+	}
+
+	addPlugin(plugin) {
+		if (this.isSetupDone()) {
+			console.error("Can't addPlugin after setup()!");
+			return;
+		}
+
+		this.plugins.push(plugin);
+		if(plugin.setDriver) plugin.setDriver(this);
+		return this;
+	}
+
+	addLibraryPath(basepath, path) {
+		this.libs[basepath] = path;
+		return this;
+	}
+
+	addClientPlugin(name) {
+		this.clientPlugins.push(name);
 		return this;
 	}
 
 	transmit(data) {
-		debug('WebsocketDriver Transmit');
-		for(let register in data) {
+		debug('WebDriver Transmit');
+		for (let register in data) {
 			this.transmitted.unshift(data[register]);
 		}
 
-		this.transmitted = WebsocketDriver.ensureArrayLength(this.transmitted, this.shiftRegisterLength);
+		this.transmitted = WebDriver.ensureArrayLength(this.transmitted, this.shiftRegisterLength);
 		return Promise.resolve()
 	}
 
 	latch() {
-		debug('WebsocketDriver Latch');
+		debug('WebDriver Latch');
 		this.latched = this.transmitted;
 		this.io.sockets.emit('update', {state: this.latched});
 		return Promise.resolve()
@@ -99,10 +136,10 @@ class WebsocketDriver {
 	 * @returns {*}
 	 */
 	static ensureArrayLength(incoming, targetLength) {
-		if(incoming.length > targetLength) {
+		if (incoming.length > targetLength) {
 			return incoming.slice(0, targetLength);
 		}
-		else if(incoming.length < targetLength) {
+		else if (incoming.length < targetLength) {
 			const fill = new Array(targetLength - incoming.length);
 			fill.fill(0);
 			return incoming.concat(fill);
@@ -113,4 +150,4 @@ class WebsocketDriver {
 	}
 }
 
-module.exports = WebsocketDriver;
+module.exports = WebDriver;

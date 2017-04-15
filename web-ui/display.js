@@ -60,8 +60,15 @@ function updateLed(boardId, ledId, enabled) {
 
 
 var socket = io();
+window.socket = socket;
 
 $(function () {
+	socket.on('setup', function (data) {
+		data.clientPlugins.forEach(function (clientPlugin) {
+			$.getScript('/plugins/'+clientPlugin+'.js');
+		})
+	});
+
 	socket.on('update', function (data) {
 		console.log('received update', data.state);
 		update(data.state);

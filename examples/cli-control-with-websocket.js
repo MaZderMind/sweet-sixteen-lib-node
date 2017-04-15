@@ -11,8 +11,7 @@ RPiDriver.canRun()
 	.catch((err) => debug("RPi Driver can't be initialized:", err))
 
 	// always enable the WebSocketDriver
-	.then(() => api.addDriver(new WebSocketDriver()
-		.enableInteraction()))
+	.then(() => api.addDriver(new WebSocketDriver()))
 
 	// setup and transmit
 	.then(() => debug('Setting up Drivers'))

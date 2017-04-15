@@ -3,6 +3,7 @@ const Api = require("../api");
 const RPiDriver = require("../driver/rpi");
 const WebDriver = require("../driver/web");
 const TogglePlugin = require("../driver/web-plugins/toggle");
+const DimPlugin = require("../driver/web-plugins/dim");
 const readline = require('readline');
 
 const shiftRegisterCount = 9;
@@ -15,6 +16,7 @@ RPiDriver.canRun()
 	// always enable the WebDriver
 	.then(() => api.addDriver(new WebDriver()
 			.addPlugin(new TogglePlugin())
+			.addPlugin(new DimPlugin())
 		))
 
 	// setup and transmit

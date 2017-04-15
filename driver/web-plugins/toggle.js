@@ -26,13 +26,18 @@ class TogglePlugin {
 			8
 		];
 
+		const dpOrder = [
+			4, 5, 6, 0, 1, 2, 3, 7,
+			15, 14, 13, 12, 11, 10, 9, 8,
+		];
+
 		debug('binding event handler');
 		connection.on('toggle', (boardId, displayId, segmentId) => {
 			const api = this.driver.api;
 			const lastData = api.lastTransmittedData;
 			let bitIndex;
 			if (segmentId === 'dp') {
-				bitIndex = displayId;
+				bitIndex = dpOrder.indexOf(displayId);
 				displayId = 8;
 			}
 			else {

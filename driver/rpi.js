@@ -1,12 +1,12 @@
 const debug = require('debug')('sweet-sixteen:RPiDriver');
 const Promise = require('bluebird');
-const Buffer = require('buffer');
 const fs = Promise.promisifyAll(require("fs"));
-const SPI = Promise.promisifyAll(require('pi-spi'));
+const SPI = require('pi-spi');
 
 class RPiDriver {
 	constructor() {
 		this.GPIO_LATCH = 22;
+		this.spi = null;
 	}
 
 	static canRun() {
@@ -30,13 +30,20 @@ class RPiDriver {
 			this.initializeSPI(),
 			this.openLatchGpio(),
 			this.openPWMGpio(),
-		]);
+		]).then(() => debug('setup done'));
 	}
 
 	transmit(data) {
-		const buf = new Buffer.alloc(this.api.shiftRegisterCount * 2);
-		data.forEach(register => buf.readUInt16BE(register));
-		return SPI.transmitAsync(buf, buf.length);
+		debug('alloc', this.api.shiftRegisterCount);
+		const buf = Buffer.alloc(this.api.shiftRegisterCount * 2);
+		debug('data', data);
+		data.forEach((register, index) => {
+			const offset = (this.api.shiftRegisterCount * 2) - (index * 2) - 2;
+			debug(this.api.shiftRegisterCount * 2, index * 2, offset);
+			buf.writeUInt16BE(register, offset);
+		});
+		debug('buf', buf);
+		return this.spi.writeAsync(buf);
 	}
 
 	latch() {
@@ -46,15 +53,28 @@ class RPiDriver {
 
 	initializeSPI() {
 		debug('SPI: initializing');
-		SPI.initialize("/dev/spidev0.0");
+		this.spi = Promise.promisifyAll( SPI.initialize("/dev/spidev0.0") );
 		debug('SPI: done');
 		return Promise.resolve();
 	}
 
 	openLatchGpio() {
-		return fs.writeFileAsync('/sys/class/gpio/export', this.GPIO_LATCH)
-			.then(() => fs.writeFileAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH+'/direction', 'out'))
-			.then(() => fs.writeFileAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH+'/value', '0'));
+		debug('Latch: initializing');
+		fs.accessAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH, fs.constants.R_OK)
+			.then(() => debug('gpio already exported'))
+			.catch(() => {
+				debug('exporting gpio');
+				return fs.writeFileAsync('/sys/class/gpio/export', '22');
+			})
+			.then(() => {
+				debug('setting direction');
+				return fs.writeFileAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH+'/direction', 'out');
+			})
+			.then(() => {
+				debug('setting value');
+				return fs.writeFileAsync('/sys/class/gpio/gpio'+this.GPIO_LATCH+'/value', '0');
+			})
+			.then(() => debug('Latch: done'))
 	}
 
 	openPWMGpio() {

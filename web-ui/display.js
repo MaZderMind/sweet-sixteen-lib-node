@@ -34,11 +34,14 @@ function updateRegister(boardId, registerId, state) {
 		}
 	}
 	else {
-		for(var bitIndex = 0; bitIndex < 8; bitIndex++) {
-			updateDisplaySegment(boardId, bitIndex, 'dp', bit(state, bitIndex));
+		var dpOrder = [
+			4, 5, 6, 0, 1, 2, 3, 7
+		];
+		for(var dpIndex = 0; dpIndex < 8; dpIndex++) {
+			updateDisplaySegment(boardId, dpOrder[dpIndex], 'dp', bit(state, dpIndex));
 		}
 		for(var bitIndex = 8; bitIndex < 16; bitIndex++) {
-			updateLed(boardId, bitIndex-8, bit(state, bitIndex));
+			updateLed(boardId, 8-(bitIndex-7), bit(state, bitIndex));
 		}
 	}
 }

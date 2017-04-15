@@ -12,6 +12,7 @@
     "express-less": "^0.1.0",
     "jquery": "^2.2",
     "jquery-svg-to-inline": "^0.1.4",
+    "pi-spi": "^1.0.1",
     "socket.io": "^1.7.3"
   }
 }

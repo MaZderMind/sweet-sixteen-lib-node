@@ -35,11 +35,9 @@ function updateRegister(boardId, registerId, state) {
 	}
 	else {
 		for(var bitIndex = 0; bitIndex < 8; bitIndex++) {
-			console.log( boardId, bitIndex, 'dp', bit(state, bitIndex) );
 			updateDisplaySegment(boardId, bitIndex, 'dp', bit(state, bitIndex));
 		}
 		for(var bitIndex = 8; bitIndex < 16; bitIndex++) {
-			console.log( boardId, bitIndex, 'dp', bit(state, bitIndex) );
 			updateLed(boardId, bitIndex-8, bit(state, bitIndex));
 		}
 	}
@@ -73,15 +71,4 @@ $(function () {
 		console.log('received update', data.state);
 		update(data.state);
 	});
-
-	$('.board').on('click', 'path, circle', function () {
-		var $segment = $(this);
-		var segmentId = $segment.attr('id');
-
-		var $display = $el.closest('svg');
-		var displayId = $display.data('id');
-
-		var $board = $display.closest('.board');
-		var boardId = $board.data('id');
-	})
 });

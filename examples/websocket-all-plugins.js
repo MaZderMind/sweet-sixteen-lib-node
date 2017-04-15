@@ -5,7 +5,8 @@ const WebDriver = require("../driver/web");
 const TogglePlugin = require("../driver/web-plugins/toggle");
 const readline = require('readline');
 
-api = new Api();
+const shiftRegisterCount = 9 * 4;
+api = new Api(shiftRegisterCount);
 RPiDriver.canRun()
 	// try to enable the RPiDriver
 	.then(() => api.addDriver(new RPiDriver()))

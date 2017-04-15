@@ -12,9 +12,39 @@ class TogglePlugin {
 	}
 
 	onConnection(connection) {
+		// FIXME remove duplication in webui-code
+		const segmentOrder = [
+			'g','t','s','u',
+			'h','k','m','a',
+			'b','n','c','p',
+			'r','d','f','e',
+		];
+
+		const registerOrder = [
+			0,1,2,3,
+			7,6,5,4,
+			8
+		];
+
 		debug('binding event handler');
-		connection.on('toggle', (bit) => {
-			debug('toggle-event!', bit);
+		connection.on('toggle', (boardId, displayId, segmentId) => {
+			const api = this.driver.api;
+			const lastData = api.lastTransmittedData;
+			let bitIndex;
+			if (segmentId === 'dp') {
+				bitIndex = displayId;
+				displayId = 8;
+			}
+			else {
+				bitIndex = segmentOrder.indexOf(segmentId);
+			}
+
+			const displayIndex = registerOrder.indexOf(displayId);
+			const registerIndex = (boardId * 9) + displayIndex;
+			lastData[registerIndex] = (lastData[registerIndex]) ^ (1<<bitIndex);
+			api
+				.transmit(lastData)
+				.then(() => api.latch());
 		});
 	}
 }

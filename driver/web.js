@@ -8,12 +8,12 @@ const ecstatic = require('ecstatic');
 class WebDriver {
 	constructor(port = 8080) {
 		this.port = port;
-		this.shiftRegisterLength = 9 * 4;
-		this.transmitted = WebDriver.ensureArrayLength([], this.shiftRegisterLength);
+		this.transmitted = [];
 		this.latched = this.transmitted;
 		this.interaction = false;
 		this.plugins = [];
 		this.clientPlugins = [];
+		this.api = null;
 		this.libs = {
 			'jquery':               __dirname + '/../node_modules/jquery/dist',
 			'jquery-svg-to-inline': __dirname + '/../node_modules/jquery-svg-to-inline/dist',
@@ -81,6 +81,13 @@ class WebDriver {
 		return !!this.io;
 	}
 
+	setApi(api) {
+		this.api = api;
+		this.transmitted = this.api.lastTransmittedData;
+		this.latched = this.transmitted;
+		return this;
+	}
+
 	addPlugin(plugin) {
 		if (this.isSetupDone()) {
 			console.error("Can't addPlugin after setup()!");
@@ -104,11 +111,7 @@ class WebDriver {
 
 	transmit(data) {
 		debug('WebDriver Transmit');
-		for (let register in data) {
-			this.transmitted.unshift(data[register]);
-		}
-
-		this.transmitted = WebDriver.ensureArrayLength(this.transmitted, this.shiftRegisterLength);
+		this.transmitted = data;
 		return Promise.resolve()
 	}
 
@@ -117,36 +120,6 @@ class WebDriver {
 		this.latched = this.transmitted;
 		this.io.sockets.emit('update', {state: this.latched});
 		return Promise.resolve()
-	}
-
-	/**
-	 *  > ensureArrayLength([7,8,9], 5)
-	 *  [ 7, 8, 9, 0, 0 ]
-	 *  > ensureArrayLength([6,7,8,9], 5)
-	 *  [ 6, 7, 8, 9, 0 ]
-	 *  > ensureArrayLength([5,6,7,8,9], 5)
-	 *  [ 5, 6, 7, 8, 9 ]
-	 *  > ensureArrayLength([4,5,6,7,8,9], 5)
-	 *  [ 4, 5, 6, 7, 8 ]
-	 *  > ensureArrayLength([3,4,5,6,7,8,9], 5)
-	 *  [ 3, 4, 5, 6, 7 ]
-	 *
-	 * @param incoming
-	 * @param targetLength
-	 * @returns {*}
-	 */
-	static ensureArrayLength(incoming, targetLength) {
-		if (incoming.length > targetLength) {
-			return incoming.slice(0, targetLength);
-		}
-		else if (incoming.length < targetLength) {
-			const fill = new Array(targetLength - incoming.length);
-			fill.fill(0);
-			return incoming.concat(fill);
-		}
-		else {
-			return incoming;
-		}
 	}
 }
 

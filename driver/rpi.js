@@ -7,6 +7,10 @@ class RPiDriver {
 		debug("Disabling RPi Driver");
 		return Promise.reject("not on an RPi")
 	}
+	setApi(api) {
+		this.api = api;
+		return this;
+	}
 
 	setup() {
 		debug('RPi Setup');

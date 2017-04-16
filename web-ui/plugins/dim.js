@@ -1,27 +1,30 @@
-let value = 100;
+var value = 100;
 
 function setValue(input) {
 	if(input < 0) input = 0;
-	if(input > 100) input = 1;
+	if(input > 100) input = 100;
 
-	$value.text(input / 100);
+	$value.text(input+'%');
 	socket.emit('dim', input / 100);
 	value = input;
 }
 
-const $plus  = $('<button>')
+var $plus  = $('<button>')
 	.text('+')
 	.on('click', function () {
-		setValue(value + 10);
+		setValue(value + 5);
 	});
-const $minus = $('<button>')
+var $minus = $('<button>')
 	.text('-')
 	.on('click', function () {
-		setValue(value - 10);
+		setValue(value - 5);
 	});
-const $value = $('<span>').text(value);
+var $value = $('<span>');
 
-$('<div>')
+setValue(value);
+
+$('<fieldset>')
+	.append('<legend>Dim:</legend>')
 	.append($plus)
 	.append($minus)
 	.append($value)

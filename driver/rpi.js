@@ -1,7 +1,7 @@
 const debug = require('debug')('sweet-sixteen:RPiDriver');
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require("fs"));
-const rpio = require('rpio');
+let rpio = null;
 
 function retry(operation, delay) {
 	return operation().catch(function(reason) {
@@ -33,6 +33,7 @@ class RPiDriver {
 	}
 
 	setup() {
+		rpio = require('rpio');
 		rpio.init({mapping: 'physical', gpiomem: false});
 		this.initializeSPI();
 		this.initializeLatchGpio();

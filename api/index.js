@@ -73,7 +73,12 @@ class Api {
 	 * @returns {*}
 	 */
 	static ensureArrayLength(incoming, targetLength) {
-		if (incoming.length > targetLength) {
+		if(!incoming) {
+			const arr = new Array(targetLength);
+			arr.fill(0);
+			return arr;
+		}
+		else if (incoming.length > targetLength) {
 			return incoming.slice(0, targetLength);
 		}
 		else if (incoming.length < targetLength) {

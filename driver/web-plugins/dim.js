@@ -12,6 +12,7 @@ class DimPlugin {
 	}
 
 	onConnection(connection) {
+		debug('binding event handler');
 		connection.on('dim', (value) => {
 			const api = this.driver.api;
 			api.dim(value);

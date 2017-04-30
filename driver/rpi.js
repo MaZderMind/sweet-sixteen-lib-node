@@ -41,9 +41,9 @@ class RPiDriver {
 	}
 
 	transmit(data) {
-		const buf = Buffer.alloc(this.api.shiftRegisterCount * 2);
+		const buf = Buffer.alloc(this.api.boardCount * this.api.SHIFT_REGISTERS_PER_BOARD * 2);
 		data.forEach((register, index) => {
-			const offset = (this.api.shiftRegisterCount * 2) - (index * 2) - 2;
+			const offset = (this.api.boardCount * this.api.SHIFT_REGISTERS_PER_BOARD * 2) - (index * 2) - 2;
 			buf.writeUInt16BE(register, offset);
 		});
 

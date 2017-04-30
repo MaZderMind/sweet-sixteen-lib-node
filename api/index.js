@@ -3,10 +3,15 @@ const Promise = require('bluebird');
 let ecstatic = require('ecstatic');
 
 class Api {
-	constructor(shiftRegisterCount) {
+	constructor(boardCount) {
 		this.drivers = [];
-		this.shiftRegisterCount = shiftRegisterCount;
-		this.lastTransmittedData = Api.ensureArrayLength([], this.shiftRegisterCount);
+		this.boardCount = boardCount;
+		this.SHIFT_REGISTERS_PER_BOARD = 9;
+		this.lastTransmittedData = Api.ensureArrayLength([], this.getShiftRegisterCount());
+	}
+
+	getShiftRegisterCount() {
+		return this.boardCount * this.SHIFT_REGISTERS_PER_BOARD;
 	}
 
 	addDriver(driver) {
@@ -21,7 +26,7 @@ class Api {
 
 	transmit(data) {
 		debug('transmit');
-		data = Api.ensureArrayLength(data, this.shiftRegisterCount);
+		data = Api.ensureArrayLength(data, this.getShiftRegisterCount());
 		this.lastTransmittedData = data;
 		return Promise.all(
 			this.drivers.map((driver) => driver.transmit(data))
@@ -43,7 +48,7 @@ class Api {
 
 	test() {
 		debug('test');
-		const full = new Array(this.shiftRegisterCount);
+		const full = new Array(this.getShiftRegisterCount());
 		full.fill(0xFFFF);
 		return this.transmit(full)
 			.then(() => this.latch())

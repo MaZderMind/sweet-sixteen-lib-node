@@ -57,6 +57,7 @@ class WebDriver {
 		io.on('connection', (socket) => {
 			debug('New Connection, sending current latched State as Update');
 			socket.emit('setup', {
+				boardCount: this.api.boardCount,
 				clientPlugins: this.clientPlugins
 			});
 			socket.emit('update', {state: this.latched});

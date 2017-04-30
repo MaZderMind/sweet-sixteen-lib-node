@@ -7,8 +7,8 @@ const DimPlugin = require("../driver/web-plugins/dim");
 const AnimatePlugin = require("../driver/web-plugins/animate");
 const readline = require('readline');
 
-const shiftRegisterCount = 9;
-api = new Api(shiftRegisterCount);
+const boardCount = 2;
+api = new Api(boardCount);
 RPiDriver.canRun()
 	// try to enable the RPiDriver
 	.then(() => api.addDriver(new RPiDriver()))
